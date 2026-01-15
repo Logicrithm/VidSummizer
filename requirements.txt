@@ -1,0 +1,120 @@
+# =============================================================================
+# VidSummarize - Complete Python Dependencies
+# Install with: pip install -r requirements.txt
+# Last Updated: January 2026
+# 
+# FLEXIBLE VERSIONING - Automatically gets compatible versions
+# 1. FFmpeg binary is REQUIRED separately (https://ffmpeg.org/download.html)
+# 2. For GPU support, see CUDA installation notes at bottom
+# 3. Uses flexible version constraints (>=, <=) for compatibility
+# =============================================================================
+
+# ==================== CORE WEB FRAMEWORK ====================
+Flask>=3.0.0
+Werkzeug>=3.0.0
+Jinja2>=3.0.0
+MarkupSafe>=2.0.0
+itsdangerous>=2.0.0
+click>=8.0.0
+
+# ==================== VIDEO & AUDIO PROCESSING ====================
+# Video download and format conversion
+yt-dlp>=2023.0.0
+ffmpeg-python>=0.2.0
+
+# Audio processing libraries
+scipy>=1.10.0
+librosa>=0.9.0
+soundfile>=0.12.0
+sounddevice>=0.4.0
+
+# ==================== TRANSCRIPTION (Whisper) ====================
+# Primary: Faster-Whisper (optimized inference)
+faster-whisper>=0.9.0
+
+# Fallback: OpenAI Whisper (reference implementation)
+openai-whisper>=20230314
+
+# Audio/Numeric processing
+numpy>=1.22.0
+
+# ==================== MACHINE LEARNING & MODELS ====================
+# Core ML framework
+torch>=2.0.0
+torchaudio>=2.0.0
+torchvision>=0.15.0
+
+# Transformer models and tokenization
+transformers>=4.30.0
+sentencepiece>=0.1.95
+tokenizers>=0.13.0
+
+# Model optimization (optional but recommended)
+onnx>=1.12.0
+onnxruntime>=1.15.0
+
+# ==================== TEXT PROCESSING & NLP ====================
+# Advanced text operations
+regex>=2023.0.0
+nltk>=3.8.0
+unidecode>=1.3.0
+
+# Unicode and encoding handling
+chardet>=5.0.0
+charset-normalizer>=3.0.0
+
+# ==================== PDF GENERATION ====================
+reportlab>=4.0.0
+Pillow>=9.0.0
+
+# ==================== DATA & SERIALIZATION ====================
+requests>=2.28.0
+urllib3>=1.26.0
+
+# YAML support
+PyYAML>=6.0
+
+# ==================== ENVIRONMENT & CONFIGURATION ====================
+python-dotenv>=0.21.0
+
+# ==================== UTILITY & LOGGING ====================
+python-dateutil>=2.8.0
+pytz>=2023.0
+
+# ==================== OPTIONAL: DEVELOPMENT & TESTING ====================
+# Uncomment these if doing development/testing
+# pytest>=7.0.0
+# black>=23.0.0
+# flake8>=5.0.0
+# mypy>=1.0.0
+
+# ==================== SECURITY & COMPATIBILITY ====================
+certifi>=2022.12.7
+
+# =============================================================================
+# INSTALLATION NOTES:
+# =============================================================================
+# 
+# For CPU-only (standard):
+#   pip install -r requirements.txt
+#
+# For GPU support (NVIDIA CUDA 12.1):
+#   1. Install CUDA Toolkit first: https://developer.nvidia.com/cuda-downloads
+#   2. Uninstall CPU versions: pip uninstall torch torchaudio torchvision -y
+#   3. Install GPU versions:
+#      pip install torch torchaudio torchvision --index-url https://download.pytorch.org/whl/cu121
+#   4. Install rest: pip install -r requirements.txt
+#
+# For AMD GPU support (ROCm):
+#   pip install torch torchaudio torchvision --index-url https://download.pytorch.org/whl/rocm5.7
+#
+# For FFmpeg (Required):
+#   Windows: Download from https://ffmpeg.org/download.html and add to PATH
+#   macOS: brew install ffmpeg
+#   Linux (Ubuntu/Debian): apt-get install ffmpeg
+#   Linux (Fedora): dnf install ffmpeg
+#
+# For Faster-Whisper with GPU (CUDA or ROCm):
+#   pip install faster-whisper[gpu]
+#
+# =============================================================================

@@ -1,0 +1,12 @@
+This is a mock transcript.
+        
+In a real application, this would contain the actual transcribed text from the video.
+The transcription is done using OpenAI's Whisper model, which provides high-quality
+speech-to-text conversion in multiple languages.
+
+This transcript would include:
+- Complete word-for-word transcription
+- Proper punctuation
+- Paragraph breaks
+- Timestamps (optional)
+        

@@ -1,0 +1,11 @@
+SUMMARY (Step 4 - Coming Soon)
+        
+This summary will be generated using BART/T5 AI models in Step 4.
+For now, this is placeholder text.
+
+The actual summary will include:
+• Key points from the video
+• Main topics discussed
+• Important conclusions
+• Condensed version of transcript
+        
