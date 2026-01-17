@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+{% block title %}Error - VidSummarize{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Error Page Specific Styles */
+.error-container {
+    min-height: calc(100vh - 200px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-2xl) var(--space-lg);
+}
+
+.error-box {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    padding: var(--space-3xl) var(--space-2xl);
+    text-align: center;
+    max-width: 600px;
+    width: 100%;
+    animation: slideIn 0.4s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.error-icon {
+    font-size: 80px;
+    margin-bottom: var(--space-lg);
+    animation: bounce 0.6s ease-out;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.error-title {
+    color: #e74c3c;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: var(--space-md);
+}
+
+.error-message {
+    color: #555;
+    font-size: 16px;
+    line-height: 1.7;
+    margin-bottom: var(--space-2xl);
+}
+
+.error-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    align-items: center;
+}
+
+.btn-home {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 30px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-home:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.upload-alternative {
+    margin-top: var(--space-2xl);
+    padding-top: var(--space-2xl);
+    border-top: 2px solid #f0f0f0;
+}
+
+.upload-alternative h3 {
+    color: #333;
+    font-size: 20px;
+    margin-bottom: var(--space-md);
+    font-weight: 600;
+}
+
+.upload-alternative p {
+    color: #666;
+    margin-bottom: var(--space-lg);
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.btn-upload {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 28px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(245, 87, 108, 0.3);
+}
+
+.btn-upload:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(245, 87, 108, 0.4);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .error-box {
+        padding: var(--space-2xl) var(--space-lg);
+    }
+    
+    .error-icon {
+        font-size: 64px;
+    }
+    
+    .error-title {
+        font-size: 24px;
+    }
+    
+    .error-message {
+        font-size: 15px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="error-box">
+        <div class="error-icon">❌</div>
+        <h1 class="error-title">Oops! Something Went Wrong</h1>
+        <div class="error-message">
+            {{ message|safe }}
+        </div>
+        
+        <div class="error-actions">
+            <a href="/" class="btn-home">
+                <span>←</span>
+                <span>Back to Home</span>
+            </a>
+        </div>
+        
+        {% if show_upload_option %}
+        <div class="upload-alternative">
+            <h3>💡 Alternative Solution</h3>
+            <p>
+                Can't process this YouTube video? No problem!<br>
+                Download the video to your computer and upload it directly for full transcription.
+            </p>
+            <a href="/#upload" class="btn-upload">
+                <span>📤</span>
+                <span>Upload Video Instead</span>
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add smooth scroll to upload section if clicking upload alternative
+    const uploadBtn = document.querySelector('.btn-upload');
+    if (uploadBtn) {
+        uploadBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = '/';
+            setTimeout(() => {
+                const uploadSection = document.querySelector('.upload-section');
+                if (uploadSection) {
+                    uploadSection.scrollIntoView({ behavior: 'smooth' });
+                    // Switch to upload tab
+                    const uploadMethodBtn = document.getElementById('uploadMethodBtn');
+                    if (uploadMethodBtn) {
+                        uploadMethodBtn.click();
+                    }
+                }
+            }, 100);
+        });
+    }
+});
+</script>
+{% endblock %}
