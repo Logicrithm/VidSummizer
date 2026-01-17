@@ -29,6 +29,8 @@ soundfile>=0.12.0
 sounddevice>=0.4.0
 
 # ==================== TRANSCRIPTION (Whisper) ====================
+youtube-transcript-api
+
 # Primary: Faster-Whisper (optimized inference)
 faster-whisper>=0.9.0
 
