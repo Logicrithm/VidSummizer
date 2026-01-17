@@ -4,6 +4,68 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+<style>
+/* YouTube Caption Warning Styles */
+.youtube-warning {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffe8a1 100%);
+    border-left: 4px solid #ff9800;
+    padding: 16px 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+    box-shadow: 0 2px 8px rgba(255, 152, 0, 0.15);
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.youtube-warning-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.youtube-warning-content {
+    flex: 1;
+}
+
+.youtube-warning-title {
+    color: #e65100;
+    font-weight: 600;
+    font-size: 15px;
+    margin: 0 0 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.youtube-warning-text {
+    color: #663c00;
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.youtube-warning-tip {
+    color: #805300;
+    font-size: 13px;
+    font-style: italic;
+    margin: 0;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 152, 0, 0.2);
+}
+</style>
 {% endblock %}
 
 {% block extra_js %}
@@ -74,12 +136,38 @@
             
             <!-- YouTube Content -->
             <div class="upload-content" id="youtubeContent">
-                <div class="input-group">
-                    <input type="url" class="input" id="youtubeUrlInput" placeholder="https://www.youtube.com/watch?v=...">
-                    <button class="btn btn-primary" id="youtubeSubmitBtn">
-                        🚀 Process
-                    </button>
+                <!-- YouTube Caption Warning -->
+                <div class="youtube-warning">
+                    <div class="youtube-warning-icon">⚠️</div>
+                    <div class="youtube-warning-content">
+                        <div class="youtube-warning-title">
+                            <span>Online Version Notice</span>
+                        </div>
+                        <p class="youtube-warning-text">
+                            <strong>Caption-Only Processing:</strong> This online version only supports YouTube videos that have captions (auto-generated or manual). Videos without captions cannot be processed here.
+                        </p>
+                        <p class="youtube-warning-tip">
+                            💡 <strong>Tip:</strong> For videos without captions, please download the video to your computer and use the "Upload Video" tab for full transcription processing.
+                        </p>
+                    </div>
                 </div>
+                
+                <!-- YouTube URL Input Form -->
+                <form action="/process_youtube" method="POST" id="youtubeForm">
+                    <div class="input-group">
+                        <input 
+                            type="url" 
+                            class="input" 
+                            id="youtubeUrlInput" 
+                            name="youtube_url"
+                            placeholder="https://www.youtube.com/watch?v=..."
+                            required
+                        >
+                        <button type="submit" class="btn btn-primary" id="youtubeSubmitBtn">
+                            🚀 Process
+                        </button>
+                    </div>
+                </form>
                 <p class="text-muted text-center" style="margin-top: var(--space-md); font-size: var(--font-size-sm);">
                     Paste any YouTube video URL to get started
                 </p>
@@ -116,7 +204,7 @@
             </div>
             
             <div class="feature-card">
-                <span class="feature-icon">🌐</span>
+                <span class="feature-icon">🌍</span>
                 <h3 class="feature-title">Multilingual Support</h3>
                 <p class="feature-description">
                     Auto-detect and handle multiple languages. Supports global content seamlessly.
