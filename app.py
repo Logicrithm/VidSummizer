@@ -425,29 +425,39 @@ def processing(job_id):
 
 @app.route('/api/status/<job_id>', methods=['GET'])
 def get_status(job_id):
-    """API endpoint to check job status"""
-    if job_id not in jobs:
-        return jsonify({'error': 'Job not found'}), 404
-    
-    job = jobs[job_id]
-    
-    if job['status'] == 'completed':
-        return jsonify({
-            'status': 'completed',
-            'progress': 100,
-            'redirect_url': url_for('results', job_id=job_id)
-        })
-    elif job['status'] == 'failed':
+    """API endpoint to check job status - ALWAYS returns JSON"""
+    try:
+        if job_id not in jobs:
+            return jsonify({
+                'status': 'failed',
+                'error': 'Job not found'
+            }), 404
+        
+        job = jobs[job_id]
+        
+        if job['status'] == 'completed':
+            return jsonify({
+                'status': 'completed',
+                'progress': 100,
+                'redirect_url': url_for('results', job_id=job_id)
+            })
+        elif job['status'] == 'failed':
+            return jsonify({
+                'status': 'failed',
+                'error': job.get('error', 'Unknown error')
+            })
+        else:
+            return jsonify({
+                'status': 'processing',
+                'stage': job.get('stage', 'unknown'),
+                'progress': job.get('progress', 0)
+            })
+    except Exception as e:
+        # Even if something crashes, return JSON
         return jsonify({
             'status': 'failed',
-            'error': job.get('error', 'Unknown error')
-        })
-    else:
-        return jsonify({
-            'status': 'processing',
-            'stage': job.get('stage', 'unknown'),
-            'progress': job.get('progress', 0)
-        })
+            'error': f'Status check failed: {str(e)}'
+        }), 500
 
 
 @app.route('/results/<job_id>')
