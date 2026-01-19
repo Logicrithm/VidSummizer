@@ -1,166 +1,279 @@
-{% extends "base.html" %} {% block title %}Processing - VidSummarize{% endblock
-%} {% block extra_css %}
-<link
-  rel="stylesheet"
-  href="{{ url_for('static', filename='css/processing.css') }}"
-/>
-{% endblock %} {% block extra_js %}
-<script
-  src="{{ url_for('static', filename='js/processingManager.js') }}"
-  defer
-></script>
-{% endblock %} {% block content %}
+{% extends "base.html" %}
 
-<div class="processing-page">
-  <div class="processing-card fade-in-up">
-    <!-- Processing Animation -->
-    <div class="processing-animation" id="processingAnimation">
-      <div class="processing-spinner">
-        <div class="spinner-ring"></div>
-        <div class="spinner-ring"></div>
-        <div class="spinner-icon">🎬</div>
-      </div>
-    </div>
+{% block title %}Processing - VidSummarize{% endblock %}
 
-    <!-- Processing Status -->
-    <div class="processing-status" id="processingStatus">
-      <h1 class="processing-title">Processing Your Video</h1>
-      <p class="processing-stage" id="currentStage">Initializing...</p>
-      <p class="processing-message" id="statusMessage">
-        Please wait while we process your video
-      </p>
-    </div>
+{% block extra_css %}
+<style>
+.processing-container {
+    min-height: calc(100vh - 200px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-2xl) var(--space-lg);
+}
 
-    <!-- Progress Bar -->
-    <div class="progress-container" id="progressContainer">
-      <div class="progress-bar-wrapper">
+.processing-box {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    padding: var(--space-3xl) var(--space-2xl);
+    text-align: center;
+    max-width: 600px;
+    width: 100%;
+}
+
+.processing-icon {
+    font-size: 64px;
+    margin-bottom: var(--space-lg);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+.processing-title {
+    color: #333;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: var(--space-md);
+}
+
+.processing-stage {
+    color: #666;
+    font-size: 16px;
+    margin-bottom: var(--space-xl);
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #f0f0f0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: var(--space-lg);
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 10px;
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+.progress-text {
+    color: #888;
+    font-size: 14px;
+    margin-bottom: var(--space-xl);
+}
+
+.processing-steps {
+    text-align: left;
+    margin-top: var(--space-2xl);
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md);
+    margin-bottom: var(--space-sm);
+    border-radius: 8px;
+    background: #f8f9fa;
+    transition: all 0.3s ease;
+}
+
+.step.active {
+    background: #e3f2fd;
+    border-left: 4px solid #2196F3;
+}
+
+.step.completed {
+    background: #e8f5e9;
+    border-left: 4px solid #4CAF50;
+}
+
+.step-icon {
+    font-size: 20px;
+}
+
+.step-text {
+    flex: 1;
+    font-size: 14px;
+    color: #555;
+}
+
+.error-message {
+    background: #ffebee;
+    border: 2px solid #f44336;
+    padding: var(--space-lg);
+    border-radius: 8px;
+    color: #c62828;
+    margin-top: var(--space-xl);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="processing-container">
+    <div class="processing-box">
+        <div class="processing-icon" id="processingIcon">⚙️</div>
+        <h1 class="processing-title">Processing Your Video</h1>
+        <p class="processing-stage" id="processingStage">Initializing...</p>
+        
         <div class="progress-bar">
-          <div
-            class="progress-bar-fill"
-            id="progressBarFill"
-            style="width: 0%"
-          ></div>
+            <div class="progress-fill" id="progressFill"></div>
         </div>
-      </div>
-      <p class="progress-percentage" id="progressPercentage">0%</p>
-      <div class="estimated-time" id="estimatedTime">
-        <span class="estimated-time-icon">⏱️</span>
-        <span>Estimated time: Calculating...</span>
-      </div>
+        <p class="progress-text" id="progressText">0%</p>
+        
+        <div class="processing-steps">
+            <div class="step" id="step-upload">
+                <span class="step-icon">📤</span>
+                <span class="step-text">Upload Complete</span>
+            </div>
+            <div class="step" id="step-audio">
+                <span class="step-icon">🎵</span>
+                <span class="step-text">Extracting Audio</span>
+            </div>
+            <div class="step" id="step-transcribe">
+                <span class="step-icon">📝</span>
+                <span class="step-text">Transcribing Speech</span>
+            </div>
+            <div class="step" id="step-summarize">
+                <span class="step-icon">🤖</span>
+                <span class="step-text">Generating Summary</span>
+            </div>
+            <div class="step" id="step-pdf">
+                <span class="step-icon">📄</span>
+                <span class="step-text">Creating Document</span>
+            </div>
+        </div>
+        
+        <div class="error-message" id="errorMessage" style="display: none;">
+            <strong>Error:</strong> <span id="errorText"></span>
+        </div>
     </div>
-
-    <!-- Video Information (hidden by default) -->
-    <div class="video-info hidden" id="videoInfo">
-      <h3 class="video-info-title">Video Details</h3>
-      <div class="video-info-content">
-        <div class="info-item">
-          <p class="info-label">Duration</p>
-          <p class="info-value" id="videoDuration">--:--</p>
-        </div>
-        <div class="info-item">
-          <p class="info-label">Language</p>
-          <p class="info-value" id="videoLanguage">Detecting...</p>
-        </div>
-        <div class="info-item">
-          <p class="info-label">File Size</p>
-          <p class="info-value" id="videoSize">---</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Processing Stages -->
-    <div class="stages-list" id="stagesList">
-      <div class="stage-item" id="stage-uploading">
-        <div class="stage-icon">📤</div>
-        <div class="stage-info">
-          <p class="stage-name">Uploading Video</p>
-          <p class="stage-description">
-            Transferring your video to our servers
-          </p>
-        </div>
-        <span class="stage-status">⏳</span>
-      </div>
-
-      <div class="stage-item" id="stage-extracting_audio">
-        <div class="stage-icon">🎵</div>
-        <div class="stage-info">
-          <p class="stage-name">Extracting Audio</p>
-          <p class="stage-description">Converting video to audio format</p>
-        </div>
-        <span class="stage-status">⏳</span>
-      </div>
-
-      <div class="stage-item" id="stage-transcribing">
-        <div class="stage-icon">📝</div>
-        <div class="stage-info">
-          <p class="stage-name">Transcribing Speech</p>
-          <p class="stage-description">Converting speech to text using AI</p>
-        </div>
-        <span class="stage-status">⏳</span>
-      </div>
-
-      <div class="stage-item" id="stage-summarizing">
-        <div class="stage-icon">✨</div>
-        <div class="stage-info">
-          <p class="stage-name">Generating Summary</p>
-          <p class="stage-description">Creating concise summary of content</p>
-        </div>
-        <span class="stage-status">⏳</span>
-      </div>
-
-      <div class="stage-item" id="stage-generating_output">
-        <div class="stage-icon">📄</div>
-        <div class="stage-info">
-          <p class="stage-name">Preparing Downloads</p>
-          <p class="stage-description">Generating TXT and PDF files</p>
-        </div>
-        <span class="stage-status">⏳</span>
-      </div>
-    </div>
-
-    <!-- Error State (hidden by default) -->
-    <div class="processing-error hidden" id="errorContainer">
-      <div class="error-icon">❌</div>
-      <h3 class="error-title">Processing Failed</h3>
-      <p class="error-message" id="errorMessage">
-        An error occurred while processing your video.
-      </p>
-    </div>
-
-    <!-- Success State (hidden by default) -->
-    <div class="processing-success hidden" id="successContainer">
-      <div class="success-icon">✅</div>
-      <h3 class="success-title">Processing Complete!</h3>
-      <p class="success-message">
-        Your video has been processed successfully. Redirecting to results...
-      </p>
-    </div>
-
-    <!-- Action Buttons -->
-    <div class="processing-actions" id="processingActions">
-      <button class="btn btn-outline cancel-btn" id="cancelBtn">
-        ❌ Cancel Processing
-      </button>
-    </div>
-
-    <!-- Error Actions (hidden by default) -->
-    <div class="processing-actions hidden" id="errorActions">
-      <button class="btn btn-primary" onclick="window.location.href='/'">
-        🏠 Back to Home
-      </button>
-      <button class="btn btn-outline" id="retryBtn">🔄 Try Again</button>
-    </div>
-
-    <!-- Success Actions (hidden by default) -->
-    <div class="processing-actions hidden" id="successActions">
-      <button class="btn btn-primary btn-lg" id="viewResultsBtn">
-        🎉 View Results
-      </button>
-    </div>
-  </div>
 </div>
 
-<!-- Hidden job ID (passed from Flask) -->
-<input type="hidden" id="jobId" value="{{ job_id }}" />
+<script>
+const jobId = "{{ job_id }}";
+const statusUrl = `/api/status/${jobId}`;
+let pollInterval;
 
+const stageMapping = {
+    'upload': 'step-upload',
+    'extracting_audio': 'step-audio',
+    'transcribing': 'step-transcribe',
+    'summarizing': 'step-summarize',
+    'generating_pdf': 'step-pdf',
+    'caption_extraction': 'step-transcribe',
+    'summarization': 'step-summarize',
+    'pdf_generation': 'step-pdf'
+};
+
+function updateProgress(progress, stage) {
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+    const processingStage = document.getElementById('processingStage');
+    
+    progressFill.style.width = progress + '%';
+    progressText.textContent = progress + '%';
+    
+    // Update stage text
+    const stageTexts = {
+        'upload': 'Upload Complete',
+        'extracting_audio': 'Extracting audio from video...',
+        'transcribing': 'Transcribing speech to text...',
+        'summarizing': 'Generating summary...',
+        'generating_pdf': 'Creating PDF document...',
+        'caption_extraction': 'Fetching video captions...',
+        'summarization': 'Generating summary...',
+        'pdf_generation': 'Creating document...',
+        'done': 'Complete!'
+    };
+    
+    processingStage.textContent = stageTexts[stage] || 'Processing...';
+    
+    // Update step visuals
+    const currentStepId = stageMapping[stage];
+    
+    // Mark all steps before current as completed
+    Object.entries(stageMapping).forEach(([key, stepId]) => {
+        const stepEl = document.getElementById(stepId);
+        if (!stepEl) return;
+        
+        if (stepId === currentStepId) {
+            stepEl.classList.add('active');
+            stepEl.classList.remove('completed');
+        } else if (Object.keys(stageMapping).indexOf(key) < Object.keys(stageMapping).indexOf(stage)) {
+            stepEl.classList.add('completed');
+            stepEl.classList.remove('active');
+        } else {
+            stepEl.classList.remove('active', 'completed');
+        }
+    });
+}
+
+function showError(message) {
+    clearInterval(pollInterval);
+    document.getElementById('processingIcon').textContent = '❌';
+    document.getElementById('processingTitle').textContent = 'Processing Failed';
+    document.getElementById('errorMessage').style.display = 'block';
+    document.getElementById('errorText').textContent = message;
+}
+
+function pollStatus() {
+    fetch(statusUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Server returned ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.status === 'completed') {
+                clearInterval(pollInterval);
+                updateProgress(100, 'done');
+                setTimeout(() => {
+                    window.location.href = data.redirect_url;
+                }, 1000);
+            } else if (data.status === 'failed') {
+                showError(data.error || 'Unknown error occurred');
+            } else if (data.status === 'processing') {
+                updateProgress(data.progress || 0, data.stage || 'processing');
+            }
+        })
+        .catch(error => {
+            console.error('Status poll error:', error);
+            showError('Lost connection to server. Please refresh the page.');
+        });
+}
+
+// Start polling when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Initial poll
+    pollStatus();
+    
+    // Poll every 2 seconds
+    pollInterval = setInterval(pollStatus, 2000);
+    
+    // Mark upload as completed
+    document.getElementById('step-upload').classList.add('completed');
+});
+
+// Clean up interval when leaving page
+window.addEventListener('beforeunload', function() {
+    if (pollInterval) {
+        clearInterval(pollInterval);
+    }
+});
+</script>
 {% endblock %}
